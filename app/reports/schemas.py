@@ -1,0 +1,20 @@
+from pydantic import BaseModel, Field
+from app.reports.enums import ReportStatus
+
+
+class ReportBase(BaseModel):
+    title: str = Field(min_length=3, max_length=100)
+    description: str = Field(min_length=5, max_length=1500)
+    address: str = Field(min_length=5, max_length=255)
+    status: ReportStatus
+    category_id: int
+    
+class ReportCreate(ReportBase):
+    pass
+
+class ReportRead(ReportBase):
+    id: int
+    user_id: int
+    model_config = {
+        "from_attributes": True
+    }

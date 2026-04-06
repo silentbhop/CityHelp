@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, String, DateTime, func, Enum
+from sqlalchemy import Integer, String, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.database import Base
 from app.db.mixins import TimeStampMixin

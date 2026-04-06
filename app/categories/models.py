@@ -4,10 +4,10 @@ from app.db.database import Base
 from app.db.mixins import TimeStampMixin
 
 
-class Category(Base):
+class Category(Base, TimeStampMixin):
     __tablename__ = "categories"
     
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
     
-    reports = relationship("Report", back_populates="category", cascade="all, delete-orphan")
+    reports = relationship("Report", back_populates="categories", cascade="all, delete-orphan")

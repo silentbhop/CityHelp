@@ -10,7 +10,7 @@ class Comment(Base, TimeStampMixin):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     text: Mapped[str] = mapped_column(Text, nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    request_id: Mapped[int] = mapped_column(ForeignKey("requests.id", ondelete="CASCADE"), nullable=False)
+    report_id: Mapped[int] = mapped_column(ForeignKey("reports.id", ondelete="CASCADE"), nullable=False)
     
-    user = relationship("User", back_populates="comments")
-    request = relationship("Report", back_populates="comments")
+    users = relationship("User", back_populates="comments")
+    reports = relationship("Report", back_populates="comments")

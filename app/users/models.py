@@ -17,6 +17,6 @@ class User(Base, TimeStampMixin):
         nullable=False
     )
     
-    comments = relationship("Comment", back_populates="user")
-    reports = relationship("Report", back_populates="user", cascade="all, delete-orphan")
+    comments = relationship("Comment", back_populates="users")
+    reports = relationship("Report", back_populates="users", cascade="all, delete-orphan")
     

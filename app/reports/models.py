@@ -20,6 +20,6 @@ class Report(Base, TimeStampMixin):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"), nullable=False)
 
-    user = relationship("User", back_populates="reports")
-    category = relationship("Category", back_populates="reports")
+    users = relationship("User", back_populates="reports")
+    categories = relationship("Category", back_populates="reports")
     comments = relationship("Comment", back_populates="reports", cascade="all, delete-orphan")

@@ -8,6 +8,9 @@ class CommentBase(BaseModel):
 class CommentCreate(CommentBase):
     pass
 
+class CommentUpdate(BaseModel):
+    text: str | None = Field(min_length=1, max_length=500, default=None)
+
 class CommentRead(CommentBase):
     id: int
     user_id: int

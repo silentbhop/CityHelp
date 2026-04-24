@@ -3,6 +3,8 @@ from app.auth.jwt import decode_token
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.users import crud
 from app.db.database import get_db
+from app.users.enums import UserRole
+from app.users.models import User
 
 
 async def get_current_user(
@@ -33,5 +35,13 @@ async def get_current_user(
     
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
+    
+    return user
+
+async def get_current_admin(
+    user: User = Depends(get_current_user)
+):
+    if user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Admin access required")
     
     return user

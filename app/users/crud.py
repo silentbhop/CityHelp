@@ -15,7 +15,7 @@ async def create_user(
     
     user = User(
         username = data.username,
-        password = password_hash,
+        password_hash = password_hash,
         role = UserRole.USER
     )
     
@@ -59,6 +59,18 @@ async def update_user(
     for field, value in update_data.items():
         setattr(user, field, value)
         
+    await db.commit()
+    await db.refresh(user)
+    
+    return user
+
+async def update_user_password(
+    db: AsyncSession,
+    user: User,
+    new_password_hash: str
+):
+    user.password_hash = new_password_hash
+    
     await db.commit()
     await db.refresh(user)
     

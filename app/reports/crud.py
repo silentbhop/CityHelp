@@ -16,6 +16,7 @@ async def create_report(
         description = data.description,
         address = data.address,
         user_id = user_id,
+        category_id = data.category_id,
         status = ReportStatus.REVIEW
     )
     

@@ -6,7 +6,7 @@ from app.categories.schemas import CategoryCreate, CategoryRead, CategoryUpdate
 from app.categories import crud
 
 
-router = APIRouter(prefix="/categories", tags=["categories"])
+router = APIRouter(prefix="/api/categories", tags=["categories"])
 
 @router.post("/", response_model=CategoryRead)
 async def create_category(data: CategoryCreate, db: AsyncSession = Depends(get_db), user = Depends(get_current_admin)):

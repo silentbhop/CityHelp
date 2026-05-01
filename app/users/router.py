@@ -6,7 +6,7 @@ from app.users.schemas import PasswordUpdate, UserCreate, UserRead, UserUpdate
 from app.users import crud
 from app.core.security import verify_password, hash_password
 
-router = APIRouter(prefix="/users", tags=["users"])
+router = APIRouter(prefix="/api/users", tags=["users"])
 
 @router.get("/me", response_model=UserRead)
 async def get_me(user = Depends(get_current_user)):

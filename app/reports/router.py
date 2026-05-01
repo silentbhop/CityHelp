@@ -7,7 +7,7 @@ from app.reports.schemas import ReportCreate, ReportRead, ReportUpdate, ReportSt
 from app.reports import crud
 
 
-router = APIRouter(prefix="/reports", tags=["reports"])
+router = APIRouter(prefix="/api/reports", tags=["reports"])
 router.include_router(comments_router)
 
 @router.post("/", response_model=ReportRead)

@@ -7,7 +7,7 @@ from app.auth.service import login_user
 from app.users.schemas import UserCreate, UserLogin, UserRead
 from app.users import crud
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 @router.post("/register", response_model=UserRead)
 async def register(
@@ -38,10 +38,6 @@ async def register(
     
     return user
     
-
-
-
-
 @router.post("/login")
 async def login(
     data: UserLogin,

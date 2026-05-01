@@ -7,7 +7,7 @@ from app.comments import crud
 
 router = APIRouter(tags=["comments"])
 
-@router.post("/{report_id}/comments", response_model=CommentRead)
+@router.post("/api/{report_id}/comments", response_model=CommentRead)
 async def create_comment(
     report_id: int,
     data: CommentCreate,

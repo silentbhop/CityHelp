@@ -38,6 +38,32 @@ async def get_current_user(
     
     return user
 
+async def get_current_user_optional(
+    request: Request,
+    db: AsyncSession = Depends(get_db)
+):
+    token = request.cookies.get("access_token")
+
+    if not token:
+        return None
+
+    payload = decode_token(token)
+    if not payload:
+        return None
+
+    sub = payload.get("sub")
+    if not sub:
+        return None
+
+    try:
+        user_id = int(sub)
+    except ValueError:
+        return None
+
+    user = await crud.get_user_by_id(db, user_id)
+
+    return user
+
 async def get_current_admin(
     user: User = Depends(get_current_user)
 ):

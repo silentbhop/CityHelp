@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}CityHelp{% endblock %}</title>
+
+    <link rel="stylesheet" href="/static/css/styles.css">
+
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+<div class="navbar">
+    <div class="nav-left">
+        <a href="/reports">CityHelp</a>
+    </div>
+
+    <div class="nav-right">
+        <a href="/reports">Главная</a>
+        {% if user %}
+            <span>Добро пожаловать, {{ user.username }}</span>
+            <a href="/logout">Выйти</a>
+        {% else %}
+            <a href="/login">Войти</a>
+            <a href="/register">Регистрация</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
+
+</body>
+</html>

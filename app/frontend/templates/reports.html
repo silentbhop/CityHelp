@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Заявки{% endblock %}
+
+{% block content %}
+<div class="container">
+    <header>
+        <h1>Заявки</h1>
+        {% if user %}
+            <p>Привет, {{ user.username }}!</p>
+        {% else %}
+            <p><a href="/login">Войдите</a>, чтобы создавать и комментировать заявки.</p>
+        {% endif %}
+    </header>
+
+    {% if reports %}
+        {% for item in reports %}
+            <article class="report-card">
+                <h2><a href="/reports/{{ item.report.id }}">{{ item.report.title }}</a></h2>
+                <p class="report-meta">
+                    Адрес: {{ item.report.address or "не указан" }}
+                </p>
+                <p class="report-description">
+                    {{ item.report.description }}
+                </p>
+                <div class="report-footer">
+                    <span class="report-status">Статус: {{ item.report.status.value }}</span>
+                    {% if item.report.created_at %}
+                        <span>{{ item.report.created_at.strftime("%d.%m.%Y %H:%M") }}</span>
+                    {% endif %}
+                </div>
+                <p class="report-comments">Комментарии: {{ item.comments_count }}</p>
+            </article>
+        {% endfor %}
+    {% else %}
+        <div class="empty">
+            <p>Пока нет заявок. Обновите страницу позже.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

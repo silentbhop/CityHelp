@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}{{ report.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <article class="report-card">
+        <h1>{{ report.title }}</h1>
+        <p class="report-description">{{ report.description }}</p>
+        <p class="report-meta">Адрес: {{ report.address or "не указан" }}</p>
+        <div class="report-footer">
+            <span class="report-status">Статус: {{ report.status.value }}</span>
+            {% if report.created_at %}
+                <span>{{ report.created_at.strftime("%d.%m.%Y %H:%M") }}</span>
+            {% endif %}
+        </div>
+    </article>
+
+    <hr>
+
+    <section class="comments-section">
+        <h3>Комментарии</h3>
+        {% if comments %}
+            {% for c in comments %}
+                <div class="comment">
+                    <p>{{ c.text }}</p>
+                    {% if c.created_at %}
+                        <small>Создано: {{ c.created_at.strftime("%d.%m.%Y %H:%M") }}</small>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="empty">Комментариев пока нет.</p>
+        {% endif %}
+
+        {% if user %}
+            <form class="comment-form" method="post" action="/reports/{{ report.id }}/comments">
+                <textarea name="text" placeholder="Напишите комментарий..." required></textarea>
+                <button type="submit">Отправить</button>
+            </form>
+        {% else %}
+            <p><a href="/login">Войдите</a>, чтобы оставить комментарий.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

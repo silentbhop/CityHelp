@@ -1,6 +1,7 @@
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.comments.models import Comment
 from app.reports.models import Report
 from app.reports.schemas import ReportCreate, ReportStatusUpdate, ReportUpdate
 from app.reports.enums import ReportStatus
@@ -38,8 +39,20 @@ async def get_report_by_id(
 async def get_reports(
     db: AsyncSession
 ) -> list[Report]:
-    result = await db.execute(select(Report))
+    result = await db.execute(select(Report).order_by(Report.created_at.desc()))
     return list(result.scalars().all())
+
+async def get_reports_with_comment_count(db: AsyncSession):
+    result = await db.execute(select(
+        Report,
+        func.count(Comment.id).label("comments_count")
+    ).join(Comment, Comment.report_id == Report.id, isouter=True).group_by(Report.id).order_by(Report.created_at.desc()))
+    
+    rows = result.all()
+    return [
+        {"report": row.Report, "comments_count": row.comments_count or 0}
+        for row in rows
+    ]
 
 async def update_report(
     db: AsyncSession,

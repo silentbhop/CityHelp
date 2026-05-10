@@ -49,15 +49,12 @@ async def get_user_by_username(
     )
     return result.scalar_one_or_none()
 
-async def update_user(
+async def update_username(
     db: AsyncSession,
     user: User,
     data: UserUpdate
 ) -> User:
-    update_data = data.model_dump(exclude_unset=True)
-    
-    for field, value in update_data.items():
-        setattr(user, field, value)
+    user.username = data.username
         
     await db.commit()
     await db.refresh(user)
@@ -75,6 +72,19 @@ async def update_user_password(
     await db.refresh(user)
     
     return user
+
+async def block_user(db: AsyncSession, user: User) -> User:
+    user.is_blocked = True
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+async def unblock_user(db: AsyncSession, user: User) -> User:
+    user.is_blocked = False
+    await db.commit()
+    await db.refresh(user)
+    return user
+
 
 async def delete_user(
     db: AsyncSession,

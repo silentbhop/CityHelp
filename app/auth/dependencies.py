@@ -36,6 +36,9 @@ async def get_current_user(
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
     
+    if user.is_blocked:
+        raise HTTPException(status_code=403, detail="Your account has been blocked")
+    
     return user
 
 async def get_current_user_optional(
@@ -61,6 +64,9 @@ async def get_current_user_optional(
         return None
 
     user = await crud.get_user_by_id(db, user_id)
+    
+    if user and user.is_blocked:
+        return None
 
     return user
 

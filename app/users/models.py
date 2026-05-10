@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, String, Enum
+from sqlalchemy import Boolean, Integer, String, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.database import Base
 from app.db.mixins import TimeStampMixin
@@ -16,6 +16,7 @@ class User(Base, TimeStampMixin):
         default=UserRole.USER,
         nullable=False
     )
+    is_blocked: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     
     comments = relationship("Comment", back_populates="users")
     reports = relationship("Report", back_populates="users", cascade="all, delete-orphan")

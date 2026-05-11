@@ -67,7 +67,48 @@ async def reports_list(
         },
     )
     
+@router.get("/reports/my")
+async def my_reports(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    user = Depends(get_current_user),
+    search: str = "",
+    status: str = "",
+    category_id: int = 0,
+    page: int = 1
+):
+    categories = await categories_crud.get_categories(db)
     
+    reports, total = await reports_crud.get_reports_with_comment_count(
+        db,
+        search=search or None,
+        status=status or None,
+        category_id=category_id or None,
+        user_id = user.id,
+        page=page,
+        per_page=PER_PAGE,
+    )
+    
+    total_pages = ceil(total / PER_PAGE) if total else 1
+    
+    return templates.TemplateResponse(
+        request=request,
+        name="my_reports.html",
+        context={
+            "reports": reports,
+            "user": user,
+            "categories": categories,
+            "statuses": ReportStatus,
+            "search": search,
+            "status": status,
+            "category_id": category_id,
+            "page": page,
+            "total_pages": total_pages,
+            "total": total,
+        },
+    )
+
+
 @router.get("/reports/create")
 async def create_report_page(
     request: Request,
@@ -417,4 +458,5 @@ async def admin_unblock_user(
         raise HTTPException(status_code=404, detail="User not found")
     await users_crud.unblock_user(db, target)
     return RedirectResponse(url="/admin?tab=users", status_code=303)
+
 

@@ -47,8 +47,9 @@ async def get_reports_with_comment_count(
     search: str | None = None,
     status: str | None = None,
     category_id: int | None = None,
+    user_id: int | None = None,
     page: int = 1,
-    per_page: int = 5,
+    per_page: int = 5
 ):
     query = (
         select(Report, func.count(Comment.id).label("comments_count"))
@@ -75,6 +76,9 @@ async def get_reports_with_comment_count(
 
     if category_id:
         query = query.where(Report.category_id == category_id)
+        
+    if user_id is not None:
+        query = query.where(Report.user_id == user_id)
 
     count_query = select(func.count()).select_from(query.subquery())
     total_result = await db.execute(count_query)

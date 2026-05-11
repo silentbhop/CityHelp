@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Профиль — CityHelp{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <h1 class="page-title">Профиль</h1>
+  <p class="page-subtitle">Управление аккаунтом</p>
+</div>
+
+<div class="profile-grid">
+
+  <div class="profile-box">
+    <div class="profile-box-title">Имя пользователя</div>
+
+    {% if username_error %}
+      <div class="alert alert-error">{{ username_error }}</div>
+    {% endif %}
+    {% if username_success %}
+      <div class="alert alert-success">{{ username_success }}</div>
+    {% endif %}
+
+    <form method="post" action="/profile/username">
+      <div class="form-group">
+        <label for="un">Новое имя</label>
+        <input type="text" id="un" name="username"
+               value="{{ user.username }}" minlength="3" maxlength="30" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm">Сохранить</button>
+    </form>
+  </div>
+
+  <div class="profile-box">
+    <div class="profile-box-title">Пароль</div>
+
+    {% if password_error %}
+      <div class="alert alert-error">{{ password_error }}</div>
+    {% endif %}
+    {% if password_success %}
+      <div class="alert alert-success">{{ password_success }}</div>
+    {% endif %}
+
+    <form method="post" action="/profile/password">
+      <div class="form-group">
+        <label for="op">Текущий пароль</label>
+        <input type="password" id="op" name="old_password" required>
+      </div>
+      <div class="form-group">
+        <label for="np">Новый пароль</label>
+        <input type="password" id="np" name="new_password" minlength="6" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm">Изменить</button>
+    </form>
+  </div>
+
+</div>
+
+<div class="profile-info-grid">
+  <div class="profile-info-item">
+    <div class="pii-label">ID</div>
+    <div class="pii-value">#{{ user.id }}</div>
+  </div>
+  <div class="profile-info-item">
+    <div class="pii-label">Имя</div>
+    <div class="pii-value">{{ user.username }}</div>
+  </div>
+  <div class="profile-info-item">
+    <div class="pii-label">Роль</div>
+    <div class="pii-value">
+      {% if user.role.value == "admin" %}
+        <span class="pill pill-admin">Администратор</span>
+      {% else %}
+        <span class="pill pill-user">Пользователь</span>
+      {% endif %}
+    </div>
+  </div>
+  <div class="profile-info-item">
+    <div class="pii-label">Статус</div>
+    <div class="pii-value"><span class="pill pill-ok">Активен</span></div>
+  </div>
+</div>
+
+{% endblock %}

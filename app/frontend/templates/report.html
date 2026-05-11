@@ -1,46 +1,68 @@
 {% extends "base.html" %}
-
-{% block title %}{{ report.title }}{% endblock %}
+{% block title %}{{ report.title }} — CityHelp{% endblock %}
 
 {% block content %}
-<div class="container">
-    <article class="report-card">
-        <h1>{{ report.title }}</h1>
-        <p class="report-description">{{ report.description }}</p>
-        <p class="report-meta">Адрес: {{ report.address or "не указан" }}</p>
-        <div class="report-footer">
-            <span class="report-status">Статус: {{ report.status.value }}</span>
-            {% if report.created_at %}
-                <span>{{ report.created_at.strftime("%d.%m.%Y %H:%M") }}</span>
-            {% endif %}
-        </div>
-    </article>
 
-    <hr>
+<a href="/reports" class="back">← Все заявки</a>
 
-    <section class="comments-section">
-        <h3>Комментарии</h3>
-        {% if comments %}
-            {% for c in comments %}
-                <div class="comment">
-                    <p>{{ c.text }}</p>
-                    {% if c.created_at %}
-                        <small>Создано: {{ c.created_at.strftime("%d.%m.%Y %H:%M") }}</small>
-                    {% endif %}
-                </div>
-            {% endfor %}
-        {% else %}
-            <p class="empty">Комментариев пока нет.</p>
+<div class="detail-card">
+  <div class="detail-header">
+    <div>
+      <h1 class="detail-title">{{ report.title }}</h1>
+      <div class="report-meta">
+        <span>📍 {{ report.address or "адрес не указан" }}</span>
+        {% if report.created_at %}
+          <span class="meta-dot">·</span>
+          <span>{{ report.created_at.strftime("%d.%m.%Y %H:%M") }}</span>
         {% endif %}
-
-        {% if user %}
-            <form class="comment-form" method="post" action="/reports/{{ report.id }}/comments">
-                <textarea name="text" placeholder="Напишите комментарий..." required></textarea>
-                <button type="submit">Отправить</button>
-            </form>
-        {% else %}
-            <p><a href="/login">Войдите</a>, чтобы оставить комментарий.</p>
-        {% endif %}
-    </section>
+      </div>
+    </div>
+    {% if report.status.value == "На проверке" %}
+      <span class="pill pill-review">{{ report.status.value }}</span>
+    {% elif report.status.value == "Ожидает решения" %}
+      <span class="pill pill-pending">{{ report.status.value }}</span>
+    {% else %}
+      <span class="pill pill-resolved">{{ report.status.value }}</span>
+    {% endif %}
+  </div>
+  <div class="detail-body">{{ report.description }}</div>
 </div>
+
+<div class="comments-section">
+  <div class="comments-title">Комментарии — {{ comments | length }}</div>
+
+  {% if comments %}
+    {% for c in comments %}
+      <div class="comment-item">
+        <p class="comment-text">{{ c.text }}</p>
+        {% if c.created_at %}
+          <span class="comment-time">{{ c.created_at.strftime("%d.%m.%Y %H:%M") }}</span>
+        {% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-state" style="padding:30px;">
+      <span class="empty-icon">💬</span>
+      <p>Комментариев пока нет</p>
+    </div>
+  {% endif %}
+
+  {% if user %}
+    <div class="comment-form-box">
+      <div class="comment-form-label">Оставить комментарий</div>
+      <form method="post" action="/reports/{{ report.id }}/comments">
+        <textarea name="text" placeholder="Напишите комментарий…" required></textarea>
+        <div style="margin-top:9px;">
+          <button type="submit" class="btn btn-primary btn-sm">Отправить</button>
+        </div>
+      </form>
+    </div>
+  {% else %}
+    <div style="margin-top:12px; padding:15px; background:var(--white); border:1px solid var(--border);
+                border-radius:var(--r); text-align:center; font-size:14px; color:var(--text3);">
+      <a href="/login">Войдите</a>, чтобы оставить комментарий
+    </div>
+  {% endif %}
+</div>
+
 {% endblock %}

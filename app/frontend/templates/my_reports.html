@@ -31,7 +31,7 @@
 
 </div>
 
-<form class="filter-bar" method="get" action="/reports">
+<form class="filter-bar" method="get" action="/reports/my">
   <div class="filter-group" style="flex:2; min-width:200px;">
     <label for="fs">Поиск</label>
     <input id="fs" name="search" value="{{ search }}"
@@ -65,7 +65,7 @@
   <div style="display:flex; gap:7px; align-items:flex-end; padding-bottom:1px;">
     <button type="submit" class="btn btn-primary btn-sm">Найти</button>
     {% if search or status or category_id %}
-      <a href="/reports" class="btn btn-ghost btn-sm">Сбросить</a>
+      <a href="/reports/my" class="btn btn-ghost btn-sm">Сбросить</a>
     {% endif %}
   </div>
 </form>
@@ -100,20 +100,20 @@
 
   {% if total_pages > 1 %}
   <div class="pagination">
-    <a href="/reports?{{ qs }}&page={{ page - 1 }}"
+    <a href="/reports/my?{{ qs }}&page={{ page - 1 }}"
        class="page-num {% if page <= 1 %}disabled{% endif %}">‹</a>
 
     {% for p in range(1, total_pages + 1) %}
       {% if p == page %}
         <span class="page-num active">{{ p }}</span>
       {% elif p == 1 or p == total_pages or (p >= page - 2 and p <= page + 2) %}
-        <a href="/reports?{{ qs }}&page={{ p }}" class="page-num">{{ p }}</a>
+        <a href="/reports/my?{{ qs }}&page={{ p }}" class="page-num">{{ p }}</a>
       {% elif p == page - 3 or p == page + 3 %}
         <span class="page-dots">…</span>
       {% endif %}
     {% endfor %}
 
-    <a href="/reports?{{ qs }}&page={{ page + 1 }}"
+    <a href="/reports/my?{{ qs }}&page={{ page + 1 }}"
        class="page-num {% if page >= total_pages %}disabled{% endif %}">›</a>
   </div>
   {% endif %}

@@ -34,10 +34,13 @@
   {% if comments %}
     {% for c in comments %}
       <div class="comment-item">
+        <div class="comment-author">
+          <span class="comment-username">{{ c.users.username if c.users else "Пользователь" }}</span>
+          {% if c.created_at %}
+            <span class="comment-time">{{ c.created_at.strftime("%d.%m.%Y %H:%M") }}</span>
+          {% endif %}
+        </div>
         <p class="comment-text">{{ c.text }}</p>
-        {% if c.created_at %}
-          <span class="comment-time">{{ c.created_at.strftime("%d.%m.%Y %H:%M") }}</span>
-        {% endif %}
       </div>
     {% endfor %}
   {% else %}

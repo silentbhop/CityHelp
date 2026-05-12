@@ -242,7 +242,14 @@ async def login(
     password: str = Form(...),
     db: AsyncSession = Depends(get_db)
 ):
-    token = await login_user(db, username, password)
+    token, error = await login_user(db, username, password)
+    
+    if error == "blocked":
+        return templates.TemplateResponse(
+            request=request,
+            name="login.html",
+            context={"error": "Ваш аккаунт заблокирован"}
+        )
     
     if not token:
         return templates.TemplateResponse(

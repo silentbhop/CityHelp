@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.comments.models import Comment
@@ -43,7 +44,10 @@ async def get_comments_by_report(
     report_id: int
 ) -> list[Comment]:
     result = await db.execute(
-        select(Comment).where(Comment.report_id == report_id)
+        select(Comment)
+        .options(joinedload(Comment.users))
+        .where(Comment.report_id == report_id)
+        .order_by(Comment.created_at.asc())
     )
     return list(result.scalars().all())
 

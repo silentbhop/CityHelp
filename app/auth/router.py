@@ -44,7 +44,10 @@ async def login(
     response: Response,
     db: AsyncSession = Depends(get_db)
 ):
-    token = await login_user(db, data.username, data.password)
+    token, error = await login_user(db, data.username, data.password)
+    
+    if error == "blocked":
+        raise HTTPException(status_code=403, detail="Your account has been blocked")
     
     if not token:
         raise HTTPException(status_code=401, detail="Invalid credentials")

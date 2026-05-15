@@ -1,6 +1,6 @@
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from sqlalchemy.orm import joinedload
 from app.comments.models import Comment
 from app.reports.models import Report
 from app.reports.schemas import ReportCreate, ReportStatusUpdate, ReportUpdate
@@ -32,7 +32,9 @@ async def get_report_by_id(
     report_id: int
 ) -> Report | None:
     result = await db.execute(
-        select(Report).where(Report.id == report_id)
+        select(Report)
+        .options(joinedload(Report.categories), joinedload(Report.users))
+        .where(Report.id == report_id)
     )
     return result.scalar_one_or_none()
 

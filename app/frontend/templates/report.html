@@ -7,7 +7,7 @@
 
 <div class="detail-card">
   <div class="detail-header">
-    <div>
+    <div style="flex:1; min-width:0;">
       <h1 class="detail-title">{{ report.title }}</h1>
       <div class="report-meta">
         <span>📍 {{ report.address or "адрес не указан" }}</span>
@@ -15,15 +15,31 @@
           <span class="meta-dot">·</span>
           <span>{{ report.created_at.strftime("%d.%m.%Y %H:%M") }}</span>
         {% endif %}
+        {% if report.categories %}
+          <span class="meta-dot">·</span>
+          <span>{{ report.categories.name }}</span>
+        {% endif %}
       </div>
     </div>
-    {% if report.status.value == "На проверке" %}
-      <span class="pill pill-review">{{ report.status.value }}</span>
-    {% elif report.status.value == "Ожидает решения" %}
-      <span class="pill pill-pending">{{ report.status.value }}</span>
-    {% else %}
-      <span class="pill pill-resolved">{{ report.status.value }}</span>
-    {% endif %}
+    <div style="display:flex; flex-direction:column; align-items:flex-end; gap:10px; flex-shrink:0;">
+      {% if report.status.value == "На проверке" %}
+        <span class="pill pill-review">{{ report.status.value }}</span>
+      {% elif report.status.value == "Ожидает решения" %}
+        <span class="pill pill-pending">{{ report.status.value }}</span>
+      {% else %}
+        <span class="pill pill-resolved">{{ report.status.value }}</span>
+      {% endif %}
+
+      {% if user and user.id == report.user_id %}
+        <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
+          <a href="/reports/{{ report.id }}/edit" class="btn btn-ghost btn-sm">✏ Редактировать</a>
+          <form method="post" action="/reports/{{ report.id }}/delete"
+                onsubmit="return confirm('Удалить эту заявку? Это действие необратимо.')">
+            <button type="submit" class="btn btn-danger btn-sm">🗑 Удалить</button>
+          </form>
+        </div>
+      {% endif %}
+    </div>
   </div>
   <div class="detail-body">{{ report.description }}</div>
 </div>

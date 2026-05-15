@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Заявки — CityHelp{% endblock %}
+{% block title %}Мои заявки — CityHelp{% endblock %}
 
 {% block content %}
 
@@ -7,7 +7,6 @@
 
   <div>
     <h1 class="page-title">Мои заявки</h1>
-
     <p class="page-subtitle">
       {% if total %}
         Найдено: <strong>{{ total }}</strong>
@@ -18,15 +17,8 @@
   </div>
 
   <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-
-    <a href="/reports" class="btn btn-ghost">
-      ← Все заявки
-    </a>
-
-    <a href="/reports/create" class="btn btn-primary">
-      + Создать заявку
-    </a>
-
+    <a href="/reports" class="btn btn-ghost">← Все заявки</a>
+    <a href="/reports/create" class="btn btn-primary">+ Создать заявку</a>
   </div>
 
 </div>
@@ -93,7 +85,16 @@
         {% else %}
           <span class="pill pill-resolved">{{ r.status.value }}</span>
         {% endif %}
+
         <span class="report-comments">💬 {{ item.comments_count }}</span>
+
+        <div style="margin-left:auto; display:flex; gap:6px;">
+          <a href="/reports/{{ r.id }}/edit" class="btn btn-ghost btn-sm">✏ Изменить</a>
+          <form method="post" action="/reports/{{ r.id }}/delete"
+                onsubmit="return confirm('Удалить заявку «{{ r.title }}»?')">
+            <button type="submit" class="btn btn-danger btn-sm">🗑</button>
+          </form>
+        </div>
       </div>
     </div>
   {% endfor %}
@@ -101,7 +102,7 @@
   {% if total_pages > 1 %}
   <div class="pagination">
     <a href="/reports/my?{{ qs }}&page={{ page - 1 }}"
-       class="page-num {% if page <= 1 %}disabled{% endif %}">‹</a>
+      class="page-num {% if page <= 1 %}disabled{% endif %}">‹</a>
 
     {% for p in range(1, total_pages + 1) %}
       {% if p == page %}
@@ -114,7 +115,7 @@
     {% endfor %}
 
     <a href="/reports/my?{{ qs }}&page={{ page + 1 }}"
-       class="page-num {% if page >= total_pages %}disabled{% endif %}">›</a>
+      class="page-num {% if page >= total_pages %}disabled{% endif %}">›</a>
   </div>
   {% endif %}
 

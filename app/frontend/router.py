@@ -183,6 +183,109 @@ async def create_report(
     report = await reports_crud.create_report(db, report_data, user.id)
     
     return RedirectResponse(url=f"/reports/{report.id}", status_code=303)
+
+@router.get("/reports/{report_id}/edit")
+async def edit_report_page(
+    request: Request,
+    report_id: int,
+    db: AsyncSession = Depends(get_db),
+    user = Depends(get_current_user)
+):
+    report = await reports_crud.get_report_by_id(db, report_id)
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+    if report.user_id != user.id:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    categories = await categories_crud.get_categories(db)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="edit_report.html",
+        context={
+            "user": user,
+            "report": report,
+            "categories": categories,
+        }
+    )
+
+
+@router.post("/reports/{report_id}/edit")
+async def edit_report(
+    request: Request,
+    report_id: int,
+    title: str = Form(...),
+    description: str = Form(...),
+    address: str = Form(...),
+    category_id: int = Form(...),
+    db: AsyncSession = Depends(get_db),
+    user = Depends(get_current_user)
+):
+    report = await reports_crud.get_report_by_id(db, report_id)
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+    if report.user_id != user.id:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    errors = []
+
+    if len(title) < 3 or len(title) > 100:
+        errors.append("Заголовок должен быть от 3 до 100 символов")
+    if len(description) < 5 or len(description) > 1500:
+        errors.append("Описание должно быть от 5 до 1500 символов")
+    if len(address) < 5 or len(address) > 255:
+        errors.append("Адрес должен быть от 5 до 255 символов")
+
+    category = await categories_crud.get_category_by_id(db, category_id)
+    if not category:
+        errors.append("Выбранная категория не существует")
+
+    if errors:
+        categories = await categories_crud.get_categories(db)
+        return templates.TemplateResponse(
+            request=request,
+            name="edit_report.html",
+            context={
+                "user": user,
+                "report": report,
+                "categories": categories,
+                "errors": errors,
+                "form": {
+                    "title": title,
+                    "description": description,
+                    "address": address,
+                    "category_id": category_id,
+                }
+            }
+        )
+
+    from app.reports.schemas import ReportUpdate
+    update_data = ReportUpdate(
+        title=title,
+        description=description,
+        address=address,
+        category_id=category_id,
+    )
+    await reports_crud.update_report(db, report, update_data)
+
+    return RedirectResponse(url=f"/reports/{report_id}", status_code=303)
+
+
+@router.post("/reports/{report_id}/delete")
+async def delete_report(
+    report_id: int,
+    db: AsyncSession = Depends(get_db),
+    user = Depends(get_current_user)
+):
+    report = await reports_crud.get_report_by_id(db, report_id)
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+    if report.user_id != user.id:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    await reports_crud.delete_report(db, report)
+
+    return RedirectResponse(url="/reports/my", status_code=303)
     
 @router.get("/reports/{report_id}")
 async def report_detail(

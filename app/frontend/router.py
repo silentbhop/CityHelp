@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.jwt import create_access_token
 from app.auth.service import login_user
+from app.categories.schemas import CategoryCreate, CategoryUpdate
 from app.comments.schemas import CommentCreate
 from app.core.security import hash_password, verify_password
 from app.reports.enums import ReportStatus
@@ -25,7 +26,18 @@ router = APIRouter()
 
 templates = Jinja2Templates(directory="app/frontend/templates")
 
-PER_PAGE = 10
+PER_PAGE = 4
+
+@router.get("/")
+async def home(
+    request: Request,
+    user = Depends(get_current_user_optional)
+):
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
+        context={"user": user}
+    )
 
 @router.get("/reports")
 async def reports_list(
@@ -50,6 +62,15 @@ async def reports_list(
     
     total_pages = ceil(total / PER_PAGE) if total else 1
     
+    qs_parts = []
+    if search:
+        qs_parts.append(f"search={search}")
+    if status:
+        qs_parts.append(f"status={status}")
+    if category_id:
+        qs_parts.append(f"category_id={category_id}")
+    qs = "&".join(qs_parts)
+    
     return templates.TemplateResponse(
         request=request,
         name="reports.html",
@@ -64,6 +85,7 @@ async def reports_list(
             "page": page,
             "total_pages": total_pages,
             "total": total,
+            "qs": qs,
         },
     )
     
@@ -500,6 +522,7 @@ async def admin_panel(
     reports = []
     total_pages = 1
     users = []
+    categories = []
 
     if tab == "reports":
         reports, total = await reports_crud.get_reports_with_comment_count(
@@ -512,6 +535,9 @@ async def admin_panel(
 
     elif tab == "users":
         users = await users_crud.get_users(db)
+        
+    elif tab == "categories":
+        categories = await categories_crud.get_categories(db)
 
     return templates.TemplateResponse(
         request=request,
@@ -521,6 +547,7 @@ async def admin_panel(
             "tab": tab,
             "reports": reports,
             "users": users,
+            "categories": categories,
             "statuses": ReportStatus,
             "status_filter": status_filter,
             "page": page,
@@ -569,4 +596,84 @@ async def admin_unblock_user(
     await users_crud.unblock_user(db, target)
     return RedirectResponse(url="/admin?tab=users", status_code=303)
 
+@router.post("/admin/categories/create")
+async def admin_create_category(
+    request: Request,
+    name: str = Form(...),
+    db: AsyncSession = Depends(get_db),
+    admin=Depends(get_current_admin),
+):
+    name = name.strip()
 
+    if len(name) < 3 or len(name) > 50:
+        categories = await categories_crud.get_categories(db)
+        return templates.TemplateResponse(
+            request=request,
+            name="admin.html",
+            context={
+                "user": admin,
+                "tab": "categories",
+                "reports": [],
+                "users": [],
+                "categories": categories,
+                "statuses": ReportStatus,
+                "status_filter": "",
+                "page": 1,
+                "total_pages": 1,
+                "category_error": "Название должно быть от 3 до 50 символов",
+                "form_name": name,
+            },
+        )
+
+
+    existing = await categories_crud.get_categories(db)
+    if any(c.name.lower() == name.lower() for c in existing):
+        return templates.TemplateResponse(
+            request=request,
+            name="admin.html",
+            context={
+                "user": admin,
+                "tab": "categories",
+                "reports": [],
+                "users": [],
+                "categories": existing,
+                "statuses": ReportStatus,
+                "status_filter": "",
+                "page": 1,
+                "total_pages": 1,
+                "category_error": "Категория с таким названием уже существует",
+                "form_name": name,
+            },
+        )
+
+    await categories_crud.create_category(db, CategoryCreate(name=name))
+    return RedirectResponse(url="/admin?tab=categories", status_code=303)
+
+
+@router.post("/admin/categories/{category_id}/update")
+async def admin_update_category(
+    category_id: int,
+    name: str = Form(...),
+    db: AsyncSession = Depends(get_db),
+    admin=Depends(get_current_admin),
+):
+    category = await categories_crud.get_category_by_id(db, category_id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+
+    await categories_crud.update_category(db, category, CategoryUpdate(name=name.strip()))
+    return RedirectResponse(url="/admin?tab=categories", status_code=303)
+
+
+@router.post("/admin/categories/{category_id}/delete")
+async def admin_delete_category(
+    category_id: int,
+    db: AsyncSession = Depends(get_db),
+    admin=Depends(get_current_admin),
+):
+    category = await categories_crud.get_category_by_id(db, category_id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+
+    await categories_crud.delete_category(db, category)
+    return RedirectResponse(url="/admin?tab=categories", status_code=303)

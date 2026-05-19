@@ -55,6 +55,7 @@ async def get_reports_with_comment_count(
 ):
     query = (
         select(Report, func.count(Comment.id).label("comments_count"))
+        .where(Report.status != ReportStatus.REVIEW)
         .join(Comment, Comment.report_id == Report.id, isouter=True)
         .group_by(Report.id)
         .order_by(Report.created_at.desc())

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}CityHelp — взаимопомощь жителей города{% endblock %}
+
+{% block content %}
+
+<div class="hero">
+  <h1 class="hero-title">CityHelp</h1>
+  <p class="hero-subtitle">
+    Платформа взаимопомощи жителей города.<br>
+    Попросите о помощи, предложите её или найдите нужное рядом.
+  </p>
+
+  <div class="hero-actions">
+    {% if user %}
+      <a href="/reports" class="btn btn-primary btn-lg">Перейти к заявкам</a>
+      <a href="/reports/create" class="btn btn-outline btn-lg">Создать заявку</a>
+    {% else %}
+      <a href="/register" class="btn btn-primary btn-lg">Зарегистрироваться</a>
+      <a href="/login" class="btn btn-outline btn-lg">Войти</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="features">
+  <div class="feature-card">
+    <div class="feature-icon">🤝</div>
+    <h2 class="feature-title">Просите о помощи</h2>
+    <p class="feature-desc">
+      Создайте заявку - и соседи увидят, что вам нужна помощь.
+      Нужно перенести мебель, выгулять собаку или одолжить инструмент?
+    </p>
+  </div>
+
+  <div class="feature-card">
+    <div class="feature-icon">💬</div>
+    <h2 class="feature-title">Общайтесь</h2>
+    <p class="feature-desc">
+      Оставляйте комментарии к заявкам, уточняйте детали
+      и договаривайтесь напрямую с жителями вашего района.
+    </p>
+  </div>
+
+  <div class="feature-card">
+    <div class="feature-icon">📋</div>
+    <h2 class="feature-title">Следите за статусом</h2>
+    <p class="feature-desc">
+      Каждая заявка имеет статус: на проверке, ожидает решения или решено.
+      Удобная фильтрация поможет найти нужное быстро.
+    </p>
+  </div>
+</div>
+
+<style>
+
+</style>
+
+{% endblock %}

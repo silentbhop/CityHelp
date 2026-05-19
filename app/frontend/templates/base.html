@@ -10,18 +10,25 @@
 <body>
 
 <nav class="navbar">
-  <a href="/reports" class="navbar-brand">
-    <div class="navbar-logo">CH</div>
-    CityHelp
-  </a>
+
+  <div class="navbar-left">
+    <a href="/" class="navbar-brand">
+      <div class="navbar-logo">CH</div>
+      CityHelp
+    </a>
+
+    <a href="/reports" class="navbar-link">Все заявки</a>
+  </div>
 
   <div class="navbar-nav">
     {% if user %}
-    <a href="/reports/my" class="navbar-link">Мои заявки</a>
+      <a href="/reports/my" class="navbar-link">Мои заявки</a>
       <div class="navbar-divider"></div>
+
       {% if user.role.value == "admin" %}
         <a href="/admin" class="navbar-link amber">⚙ Панель</a>
       {% endif %}
+
       <a href="/profile" class="navbar-link">{{ user.username }}</a>
       <a href="/logout" class="navbar-link red">Выйти</a>
     {% else %}
@@ -29,6 +36,7 @@
       <a href="/register" class="navbar-btn">Регистрация</a>
     {% endif %}
   </div>
+
 </nav>
 
 <div class="container">

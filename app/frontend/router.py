@@ -1,4 +1,3 @@
-from collections import UserList
 from math import ceil
 
 from fastapi import APIRouter, Depends, Form, Request, Response, HTTPException
@@ -12,6 +11,7 @@ from app.comments.schemas import CommentCreate
 from app.core.security import hash_password, verify_password
 from app.reports.enums import ReportStatus
 from app.reports.schemas import ReportCreate, ReportStatusUpdate
+from app.users.enums import UserRole
 from app.users.schemas import UserCreate
 from app.db.database import get_db
 from app.reports import crud as reports_crud
@@ -56,6 +56,7 @@ async def reports_list(
         search=search or None,
         status=status or None,
         category_id=category_id or None,
+        is_admin=user is not None and user.role.value == "admin",
         page=page,
         per_page=PER_PAGE,
     )
@@ -107,6 +108,7 @@ async def my_reports(
         status=status or None,
         category_id=category_id or None,
         user_id = user.id,
+        is_admin=user is not None and user.role.value == "admin",
         page=page,
         per_page=PER_PAGE,
     )
@@ -216,7 +218,7 @@ async def edit_report_page(
     report = await reports_crud.get_report_by_id(db, report_id)
     if not report:
         raise HTTPException(status_code=404, detail="Report not found")
-    if report.user_id != user.id:
+    if report.user_id != user.id and user.role != UserRole.ADMIN:
         raise HTTPException(status_code=403, detail="Forbidden")
 
     categories = await categories_crud.get_categories(db)
@@ -246,7 +248,7 @@ async def edit_report(
     report = await reports_crud.get_report_by_id(db, report_id)
     if not report:
         raise HTTPException(status_code=404, detail="Report not found")
-    if report.user_id != user.id:
+    if report.user_id != user.id and user.role != UserRole.ADMIN:
         raise HTTPException(status_code=403, detail="Forbidden")
 
     errors = []
@@ -302,7 +304,7 @@ async def delete_report(
     report = await reports_crud.get_report_by_id(db, report_id)
     if not report:
         raise HTTPException(status_code=404, detail="Report not found")
-    if report.user_id != user.id:
+    if report.user_id != user.id and user.role != UserRole.ADMIN:
         raise HTTPException(status_code=403, detail="Forbidden")
 
     await reports_crud.delete_report(db, report)
@@ -530,6 +532,7 @@ async def admin_panel(
             status=status_filter or None,
             page=page,
             per_page=20,
+            is_admin=True,
         )
         total_pages = ceil(total / 20) if total else 1
 

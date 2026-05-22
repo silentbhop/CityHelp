@@ -51,15 +51,29 @@ async def get_reports_with_comment_count(
     category_id: int | None = None,
     user_id: int | None = None,
     page: int = 1,
+    is_admin: bool = False,
     per_page: int = 5
 ):
     query = (
         select(Report, func.count(Comment.id).label("comments_count"))
-        .where(Report.status != ReportStatus.REVIEW)
         .join(Comment, Comment.report_id == Report.id, isouter=True)
         .group_by(Report.id)
         .order_by(Report.created_at.desc())
     )
+
+    if is_admin:
+        pass
+    
+    elif user_id is not None:
+        query = query.where(
+            or_(
+                Report.status != ReportStatus.REVIEW,
+                Report.user_id == user_id
+            )
+        )
+        
+    else:
+        query = query.where(Report.status != ReportStatus.REVIEW)
 
     if search:
         query = query.where(

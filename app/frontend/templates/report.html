@@ -30,7 +30,7 @@
         <span class="pill pill-resolved">{{ report.status.value }}</span>
       {% endif %}
 
-      {% if user and user.id == report.user_id %}
+      {% if user and (user.id == report.user_id or user.role.value == "admin") %}
         <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
           <a href="/reports/{{ report.id }}/edit" class="btn btn-ghost btn-sm">✏ Редактировать</a>
           <form method="post" action="/reports/{{ report.id }}/delete"
